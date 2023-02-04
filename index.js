@@ -1,19 +1,16 @@
-const mongoose = require('mongoose')
+const winston = require("winston");
+const express = require("express");
+const app = express();
 
-const express = require('express')
-const app = express()
-const genre = require('./routes/genre')
-const customer = require('./routes/customer')
+require("./startup/logging")();
+require("./startup/routes")(app);
+require("./startup/db")();
+require("./startup/config")();
+require("./startup/validation")();
 
-mongoose.connect('mongodb://localhost:27017/vidly')
-    .then(()=> {console.log('Connected to database server')})
-    .catch(()=> console.error('Could not connect to database server'))
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () =>
+  winston.info(`Listening on port ${port}`)
+);
 
-
-app.use(express.json())
-
-app.use('/api/genres', genre)
-app.use('/api/customers', customer)
-
-const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`Listening on port ${port}`))
+module.exports = server;
